@@ -28,6 +28,32 @@ ofxSTLExporter::~ofxSTLExporter(){
 	facets.clear();
 }
 
+void ofxSTLExporter::set_mesh(ofMesh &triangle_mesh_with_normals) {
+	auto &vert = triangle_mesh_with_normals.getVertices();
+	auto &norm = triangle_mesh_with_normals.getNormals();
+	if (vert.size() != norm.size()) {
+		cout << "ofxSTLExporter error while saving mesh: number of vertices isn't equal number of normals" << endl;
+		return;
+	}
+	auto &ind = triangle_mesh_with_normals.getIndices();
+	int n = ind.size();
+	if (n % 3 != 0 || n == 0) {
+		cout << "ofxSTLExporter error while saving mesh: no indices or not triangle mesh" << endl;
+		return;
+	}
+	beginModel();
+	for (int k = 0; k < n; k += 3) {
+		ofPoint a = vert[ind[k]];
+		ofPoint b = vert[ind[k+1]];
+		ofPoint c = vert[ind[k+2]];
+		ofPoint nrm = (norm[ind[k]] + norm[ind[k + 1]] + norm[ind[k + 2]]) / 3.0;
+		nrm.normalize();	//todo check it's 0
+		addTriangle(a, b, c, nrm);
+	}
+
+
+}
+
 void ofxSTLExporter::beginModel(string _modelName){
 	modelName = _modelName;
 	facets.clear();
@@ -43,6 +69,7 @@ void ofxSTLExporter::addTriangle(const ofPoint& vert1, const ofPoint& vert2, con
 }
 
 void ofxSTLExporter::saveModel(string fileName){
+	fileName = ofToDataPath(fileName);
 	if(bUseASCIIFormat){
 		ofLog(OF_LOG_VERBOSE, "ofxSTLExporter::saveModel - saving ASCII format");
 		asciiWriter.setModelName(modelName);

@@ -33,8 +33,14 @@ class ofxSTLExporter: public ofxSTLBase{
 public:
 	ofxSTLExporter();
 	virtual ~ofxSTLExporter();
+	
+	//setting from mesh
+	void set_mesh(ofMesh &triangle_mesh_with_normals);
+
+	//setting triangle by triangle
 	void beginModel(string _solidName = "");
 	void addTriangle(const ofPoint& vert1, const ofPoint& vert2, const ofPoint& vert3, const ofPoint& normal);
+
 	void saveModel(string fileName);
 	void useASCIIFormat(bool _bUseASCIIFormat = false); //default is binary format, use this if you want to save in ASCI format
 protected:
